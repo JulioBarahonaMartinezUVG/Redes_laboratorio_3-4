@@ -34,7 +34,7 @@ class RegisterBot(slixmpp.ClientXMPP):
 
         try:
             await resp.send()
-            print("Account created for %s!" % self.boundjid)
+            print("Account: %s!" % self.boundjid)
         except IqError as e:
             print("Could not register account: %s" %
                     e.iq['error']['text'])
@@ -48,11 +48,9 @@ class Client(slixmpp.ClientXMPP):
 
     def __init__(self, user, passw):
         slixmpp.ClientXMPP.__init__(self, user, passw)
-        #print('algo pasa')
         self.jid = user
         self.password = passw
         self.add_event_handler("session_start", self.start)
-        #self.add_event_handler(self.login)
         self.register_plugin('xep_0030') # Service Discovery
         self.register_plugin('xep_0004') # Data Forms
         self.register_plugin('xep_0060') # PubSub
@@ -77,25 +75,32 @@ class Client(slixmpp.ClientXMPP):
         #await self.get_roster()
 
         access = True
-        print('se ha conectado\n')
-        print("login Listo\n")
+        print('FULL STEAMS AHEAD CREW!')
         while access:
-            print("elija una de las siguientes opciones: \n1. Mostrar todos los usuarios y su estado \n2. Agregar un usuario a sus contactos \n3. Mostrar detalles de contacto de un usuario \n4. Comunicacion 1 a 1 con algun usuario \n5. participar en conversacion grupal \n6. mensaje de precencia \n7. salir ")
-            opcion = input("opcion a elegir es: ")
-            if opcion == "1":
-                #codigo para mostrar usuarios
+            print('Bienvenid@!')
+            print('users: Mostrar todos los usuarios y su estado')
+            print('add: Agregar un usuario a sus contactos')
+            #print('details: Mostrar detalles de contacto de un usuario')
+            #print('chat: Comunicacion 1 a 1 con algun usuario')
+            #print('gchat: Conversacion grupal')
+            print('display: Mensaje de precencia')
+            print('exit: salir')
+            opcion = input('Que opcion se toma? ')
+
+            if opcion == "users":
+                #please dont die on me
                 try:
                     await self.get_roster()
                 except IqError as err:
                     print('Error: %s' % err.iq['error']['condition'])
                 except IqTimeout:
-                    print('Error: Request timed out')
+                    print('User timed out')
+
+                #updating
                 self.send_presence()
+                await asyncio.sleep(5)
 
-                print('Waiting for presence updates...\n')
-                await asyncio.sleep(10)
-
-                print('Roster for %s' % self.boundjid.bare)
+                print('My peps for %s' % self.boundjid.bare)
                 groups = self.client_roster.groups()
                 for group in groups:
                     print('\n%s' % group)
@@ -116,36 +121,20 @@ class Client(slixmpp.ClientXMPP):
                             print('   - %s (%s)' % (res, show))
                             if pres['status']:
                                 print('       %s' % pres['status'])
-
-                #print("1")
-            if opcion == "2":
-                #codigo para agregar contanto
-                new_friend = (input("user: "))
-                xmpp.send_presence_subscription(pto= new_friend + "@redes2020.xyz")
-                print("Amigo agregado")
-                #print("2")
-            if opcion == "3":
-                #codigo para mostrar detalles de un contanto
-                print("3")
-            if opcion == "4":
-                #codigo para iniciar conversacion 1 a 1 con otro usuario
-                print("4")
-            if opcion == "5":
-                #codigo para añadirme a un chat grupal
-                print("5")
-            if opcion == "6":
-                #codigo para el mensaje de presencia
+            if opcion == "add":
+                new_node = (input("user: "))
+                username = new_node + "@redes2020.xyz"
+                xmpp.send_presence_subscription(pto = username)
+                print("New contact added")
+            if opcion == "display":
                 shw = input("Estado(chat, away, xa, dnd): ")
-                stts = input("Mensaje: ")
+                stts = input("Status: ")
                 self.send_presence(pshow= shw, pstatus= stts)
-                print("Presence cambiado\n")
-            if opcion == "7":
+                print("Display status updated!")
+            if opcion == "exit":
                 access = False
-                print("entraste")
                 break
-            if opcion != "1" or opcion != "2" or opcion != "3" or opcion != "4" or opcion != "5" or opcion != "6" or opcion != "7": 
-                print("ha escrito mala su eleccion. Por favor, intentelo y sin dejar espacios en blanco")
-        print("saliste")
+        print("See you later cowboy!")
         self.disconnect()
 
 if __name__ == '__main__':
@@ -172,7 +161,7 @@ if __name__ == '__main__':
             else:
                 print("Unable to connect.")
 
-        if option == 'sign up ':
+        if option == 'sign up':
             userJID = input("userJID: ")
             password = input("password: ")
             username = userJID + "@redes2020.xyz"
