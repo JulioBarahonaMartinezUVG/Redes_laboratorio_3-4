@@ -1,4 +1,4 @@
-# Laboratorio 3 y 4  Protocolos existentes & XMPP
+# Proyecto 2:Protocolos existentes & XMPP
 
 Buscando ampliar conocimientos de protocolos en mensajeria y comunicacion usando de base los modelos implementados en los standares de XMPP. El lenguaje utilizado es Python 3.6.9.
 
@@ -32,6 +32,14 @@ Activar dependencias:
 source venv/bin/activate
 ```
 
+## Características implementadas
+
+## Dificultades
+
+## Lecciones aprendidas
+* organizar el tiempo
+* encontrar protocolos mas usados y por que
+* implementar uso 
 
 ## Bibliotecas
 
@@ -39,6 +47,7 @@ source venv/bin/activate
 * optparse
 * logging
 * sys   
+* slixmpp
 
 
 
