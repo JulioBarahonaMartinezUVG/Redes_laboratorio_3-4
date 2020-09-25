@@ -8,30 +8,33 @@ from optparse import OptionParser
 from slixmpp.exceptions import IqError, IqTimeout
 
 # basado en los ejemplos de https://sleekxmpp.readthedocs.io/en/latest/index.html
-
+# para sistemas 32 bti windows
 if sys.platform == 'win32':
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
+#para poder registrar usuarios
 class RegisterBot(slixmpp.ClientXMPP):
 
+    #crea usrnm con pswd
     def __init__(self, jid, password):
         slixmpp.ClientXMPP.__init__(self, jid, password)
         self.add_event_handler("session_start", self.start)
         self.add_event_handler("register", self.register)
 
+    # inicia la precencia en el rooster
     async def start(self, event):
-
         self.send_presence()
         await self.get_roster()
         self.disconnect()
 
+    # aca se puede ingresa el id para que se quede asociado el registro
     async def register(self, iq):
-
         resp = self.Iq()
         resp['type'] = 'set'
         resp['register']['username'] = self.boundjid.user
         resp['register']['password'] = self.password
 
+        # aca se pone por errores de servidor cliente
         try:
             await resp.send()
             print("Account: %s!" % self.boundjid)
@@ -44,8 +47,13 @@ class RegisterBot(slixmpp.ClientXMPP):
             self.disconnect()
         self.disconnect()
 
-class Client(slixmpp.ClientXMPP):
+    # se toma id para quitar pero no se por que no jala
+    def del_roster_item(self, jid):
+        return self.client_roster.remove(jid)
 
+# conexion con el server
+class Client(slixmpp.ClientXMPP):
+    # plugins par dar permiso y credenciales
     def __init__(self, user, passw):
         slixmpp.ClientXMPP.__init__(self, user, passw)
         self.jid = user
@@ -60,16 +68,19 @@ class Client(slixmpp.ClientXMPP):
         self.received = set()
         self.presences_received = asyncio.Event()
 
+    # espera que se haga el update de la precencia
     def wait_for_presences(self, pres):
-        """
-        Track how many roster entries have received presence updates.
-        """
         self.received.add(pres['from'].bare)
         if len(self.received) >= len(self.client_roster.keys()):
             self.presences_received.set()
         else:
             self.presences_received.clear()
 
+    # no se donde se pone para borrar esta porqueria
+    def del_roster_item(self, jid):
+        return self.client_roster.remove(jid)
+
+    # menu con funciones que se van a usar las comentadas no me salieron
     async def start(self, event):
         self.send_presence()
         #await self.get_roster()
@@ -80,11 +91,12 @@ class Client(slixmpp.ClientXMPP):
             print('Bienvenid@!')
             print('users: Mostrar todos los usuarios y su estado')
             print('add: Agregar un usuario a sus contactos')
+            print('display: Mensaje de precencia')
+            print('exit: salir')
+
             #print('details: Mostrar detalles de contacto de un usuario')
             #print('chat: Comunicacion 1 a 1 con algun usuario')
             #print('gchat: Conversacion grupal')
-            print('display: Mensaje de precencia')
-            print('exit: salir')
             opcion = input('Que opcion se toma? ')
 
             if opcion == "users":
@@ -100,6 +112,7 @@ class Client(slixmpp.ClientXMPP):
                 self.send_presence()
                 await asyncio.sleep(5)
 
+                # dice quienes estan despues de  time out de 5 seg
                 print('My peps for %s' % self.boundjid.bare)
                 groups = self.client_roster.groups()
                 for group in groups:
@@ -145,7 +158,7 @@ if __name__ == '__main__':
         print('####     Usuario no identificado     ####')
         print('* "log in": para iniciar sesion con usuario')
         print('* "sign up": para crear un nuevo usuario')
-        print('* "sign out": para eliminar usuario del sistema')
+        #print('* "sign out": para eliminar usuario del sistema')
         print('* "exit": Para cerrar programa')
         option = input('Que opcion se toma? ')
 
@@ -156,6 +169,7 @@ if __name__ == '__main__':
             username = userJID + "@redes2020.xyz"
             xmpp = Client(username, password)
 
+            # si no hay respues == unable to connec
             if xmpp.connect() == None:
                 xmpp.process()
             else:
@@ -179,16 +193,20 @@ if __name__ == '__main__':
         if option == 'sign out':
             userJID = input("userJID: ")
             password = input("password: ")
+            username = userJID + "@redes2020.xyz"
 
-            xmpp = Client(userJID, password)
+            xmpp = Client(username, password)
             xmpp.register_plugin('xep_0030') # Service Discovery
             xmpp.register_plugin('xep_0004') # Data Forms
             xmpp.register_plugin('xep_0060') # PubSub
             xmpp.register_plugin('xep_0199') # XMPP Ping
+
+            # elif para  saber si se pudo o no
             if xmpp.connect():
                 xmpp.process(block=False)
-                xmpp.del_roster_item(userJID + "@redes2020.zxy")
+                xmpp.del_roster_item(username)
                 xmpp.disconnect()
+                print('byebye user forever')
             else:
                 print("Bad connect.")
 

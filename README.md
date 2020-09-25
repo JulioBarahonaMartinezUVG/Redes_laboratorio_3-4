@@ -32,14 +32,27 @@ Activar dependencias:
 source venv/bin/activate
 ```
 
-## Características implementadas
+## Características
+
+### CRUD usuario
+* crear usuario
+* inicar sesion
+* salir de plroblema 
+
+### Chat
+*  mostrar usuarios conectados
+*  agregar usuario
+*  mensaje personal
+* 
 
 ## Dificultades
+* diversidad de ejemplos 
+* experiencia en protocolos
 
 ## Lecciones aprendidas
 * organizar el tiempo
 * encontrar protocolos mas usados y por que
-* implementar uso 
+* implementar uso de protocolos mas conocidos o mejor documentados
 
 ## Bibliotecas
 
